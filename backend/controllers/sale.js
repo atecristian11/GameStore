@@ -3,7 +3,7 @@ const Product = require("../models/product");
 const Sale = require("../models/sale");
 
 const registerSale = async (req, res) => {
-  if (!req.body.buyer || !req.body.price)
+  if (!req.body.buyer || !req.body.price || !req.body.nombreproducto || !req.body.nombreusuario)
     return res.status(400).send("Process failed: Incomplete data");
 
   let existingSale = await Sale.findOne({ buyer: req.body.buyer });
@@ -12,13 +12,12 @@ const registerSale = async (req, res) => {
       .status(400)
       .send("Process failed: The buyer sale is already registered");
 
-let user = await User.findOne({ cedul : "10023658" });
-if (!user)
-return res.status(400).send("Process failed: No user was assigned");
-
-let product = await Product.findOne({ code: 1 });
-if (!product)
-  return res.status(400).send("Process failed: No product was assigned");
+      const product = await Product.findOne({ name: req.body.nombreproducto });
+      if (!product)
+        return res.status(401).send("Process failed: Product not already exist");
+    
+      let user = await User.findOne({ name: req.body.nombreusuario });
+      if (!user) return res.status(400).send("Process failed: user not exist");
 
   let sale = new Sale({
     buyer: req.body.buyer, //comprador

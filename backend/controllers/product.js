@@ -6,17 +6,15 @@ const registerProduct = async (req, res) => {
     !req.body.name ||
     !req.body.price ||
     !req.body.code ||
-    !req.body.description
-  )
-    return res.status(400).sent("Process failed: Incomplete data");
+    !req.body.description ||
+    !req.body.cityStock )
+    return res.status(401).send("Process failed: Incomplete data");
 
-  let existingProduct = await Product.findOne({ code: req.body.code });
+  const existingProduct = await Product.findOne({ code: req.body.code });
   if (existingProduct)
-    return res
-      .status(400)
-      .send("Process failed: The code user is already registered");
+  return res.status(401).send("Process failed: Product already exist");
 
-  let stock = await Stock.findOne({ city: "pereira" });
+  let stock = await Stock.findOne({ city: req.body.cityStock });
   if (!stock)
     return res.status(400).send("Process failed: No stock was assigned");
 
